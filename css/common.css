@@ -1,0 +1,9 @@
+.no {
+    display: inline-block;
+    width: 15px;
+}
+
+.content {
+    display: inline-block;
+    width: 200px;
+}

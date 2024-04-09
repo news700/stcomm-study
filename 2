@@ -1,0 +1,43 @@
+<ROOT>
+  <source>
+    @type tail
+    path "/brzc/data/logs/*/system/*.system.log"
+    path_key "tailed_path"
+    pos_file "/tmp/fluentd.system.pos"
+    tag "tomcat.system"
+    refresh_interval 5s
+    <parse>
+      @type "multiline"
+      format_firstline "/^\\d{4}-\\d{2}-\\d{2}/"
+      format1 /(?<time>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}) \[(?<thread>.*?)\] \[(?<category>[^\s]+)\] \[(?<threadID>[^\s]+)\] \[(?<level>[^\s]+)\] (?<message>.*)/
+      time_key "time"
+      time_format "%Y-%m-%d %H:%M:%S.%L"
+    </parse>
+  </source>
+  <filter tomcat.**>
+    @type record_transformer
+    <record>
+      hostname ip-10-20-1-16.ap-northeast-2.compute.internal
+      service site
+      brand vans
+      env prod
+    </record>
+  </filter>
+  <match tomcat.system>
+    @type elasticsearch
+    hosts "https://vpc-brzc-ukh2tzu2xqnvimrtcdgtm3uwki.ap-northeast-2.es.amazonaws.com:443"
+    logstash_format true
+    logstash_prefix "system.v2.1"
+    index_name "system.v2.1"
+    type_name "_doc"
+    scheme "https"
+    ssl_verify true
+    request_timeout 15s
+    flush_interval 5s
+    reconnect_on_error true
+    reload_connections false
+    <buffer>
+      flush_interval 5s
+    </buffer>
+  </match>
+</ROOT>
